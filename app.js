@@ -6,12 +6,12 @@ app.use(express.json());
 
 let books = [
     {
-        id:1,
+        id: 1,
         title: 'cien años de soledad',
         author: 'miguel de cervantes'
     },
     {
-        id:2,
+        id: 2,
         title: 'don quijote',
         author: 'miguel de cervantes'
     }
@@ -26,14 +26,14 @@ app.get('/api/books',(req, res) => {
 app.get('/api/books/:id',(req, res)=> {
     const id = parseInt(req.params.id);
 
-    const book = books.find(b => b.id == id);
-    if(book){
-        return res.status(408).json({
+    const book = books.find(b => b.id === id);
+    if(!book){
+        return res.status(404).json({
             message: 'libro no encontrado'
         });
     }
 
-    res.json(books);
+    res.json(book);
 });
 
 //crear nuevo libro
@@ -57,6 +57,44 @@ app.post('/api/books', (req, res)=>{
     res.status(201).json(newbook);
 
 });
+
+// actualizar un libro existente
+app.put('/api/books/:id',(req, res) => {
+    const id = parseInt(req.params.id);
+    const{title, author} = req.body;
+    const book = books.find(b => b.id === id);
+
+    if (!book){
+        return res.status(404).json({
+            message: 'no encontrado'
+        });
+    }
+
+    book.title = title;
+    book.author = author;
+
+    res.json(book);
+});
+
+//eliminar un libro
+app.delete('/api/books/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+
+    const index = books.findIndex(b => b.id === id);
+
+    if (index === -1){
+        return res.status(404).json({
+            message: 'no encontrado'
+        });
+    }
+
+    books.splice(index, 1);
+
+    res.json({
+        mmessage: 'eliminado'
+    });
+});
+
 
 app.get('/', (req, res)=> {
     res.send('API funcionando!');
